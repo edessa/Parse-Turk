@@ -6,10 +6,10 @@ import cv2
 import json
 
 
-files = pd.read_csv('/home/lab/Annotations/50-Salads-Hand-Polygons.csv').to_dict()
+files = pd.read_csv('./Annotations/Epic-Kitchens-Batch-Round-1.csv').to_dict()
 
-print(files.keys())
-print(files['Approve'], files['Reject'], files['Input.image_url'])
+#print(files.keys())
+#print(files['Approve'], files['Reject'], files['Input.image_url'])
 
 accept = files['Approve']
 reject = files['Reject']
@@ -27,8 +27,9 @@ for i in range(len(images)):
 
 	r = requests.get(videos[i], stream=True)
 	r.raw.decode_content = True
-	video = cv2.VideoCapture(r.raw)
-
+	#print(r.raw)
+	video = cv2.VideoCapture(videos[i])
+	#print(video.size)
 	for hand in json.loads(annotations[i]):
 		pts = []
 		for pt in hand["vertices"]:
@@ -37,19 +38,24 @@ for i in range(len(images)):
 			cv2.line(img, pts[j], pts[j+1], (255, 0, 0), 2)
 	#cv2.imwrite(/home/lab/Annotations/poly-annotations/' + str(i) + '.png', img)
 	cv2.imshow('Next Active Object', img)
-	ret = True
+	ret, frame = video.read()
 	while ret:
 		ret, frame = video.read()
-		cv2.imshow('Video Frames', frame)
+		if frame is not None:
+			cv2.imshow('Video Frames', frame)
+		cv2.waitKey(10)
 	res = cv2.waitKey(0)
 	if res == ord('a'):
 		accept[i] = True
 	elif res == ord('r'):
 		reject[i] = True
+	elif res == ord('q'):
+		cv2.destroyAllWindows()
+		break
 
 print(accept, reject)
 
 files['Approve'] = accept
 files['Reject'] = reject
 
-pd.DataFrame(files).to_csv('/home/lab/Annotations/50-Salads-Hand-Polygons-Checked.csv', index=False)
+pd.DataFrame(files).to_csv('/home/lab/Annotations/Epic-Kitchens-Batch-Round-1.csv', index=False)

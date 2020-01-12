@@ -6,7 +6,7 @@ import cv2
 import json
 
 
-files = pd.read_csv('./Annotations/50-Salads-Hand-Polygons.csv').to_dict()
+files = pd.read_csv('./Annotations/Epic-Kitchens-Batch-Round-1.csv').to_dict()
 
 print(files.keys())
 print(files['Approve'], files['Reject'], files['Input.image_url'])
